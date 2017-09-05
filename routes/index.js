@@ -90,7 +90,19 @@ router.post("/api/vendor/items", function(req, res) {
 
 //update item quantity, description, and cost
 router.put("/api/vendor/items/:itemId", function(req, res) {
-
+  models.Item.update({
+    description: req.body.description,
+    cost: req.body.cost,
+    qty: req.body.qty}, {
+      where: {id: req.params.itemId}
+    })
+    .then(function(data) {
+      res.setHeader("Content-Type", "application/json");
+      res.status(201).json(data);
+    })
+    .catch(function(err) {
+      res.status(500).send("Bad Request")
+    })
 });
 
 
