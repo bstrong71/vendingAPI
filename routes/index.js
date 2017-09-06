@@ -35,9 +35,11 @@ router.post("/api/customer/items/:itemId/purchases", function(req, res) {
   })
   .then(function(item) {
     if(req.body.amtPaid < item.cost) {
-      res.status(400).send("You didn't add enough money.");
+      err = {"status": "fail", error: {"amount paid": req.body.amtPaid, "amount required": item.cost}};
+      res.status(400).send(err);
     } else if(item.qty < 1) {
-        res.status(400).send("This item is out of stock.");
+        err = {"status": "fail", error: "This item is out of stock."}
+        res.status(400).send(err);
       } else {
         let overpaid = req.body.amtPaid - item.cost;
         models.Item.update({qty: item.qty - 1}, {
