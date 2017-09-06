@@ -23,7 +23,8 @@ router.get("/api/customer/items", function(req, res) {
     }
   })
   .catch(function(err) {
-    res.status(500).send("Bad Request");
+    err = {"status": "fail", error: err};
+    res.status(500).send(err);
   })
 });
 
@@ -54,13 +55,15 @@ router.post("/api/customer/items/:itemId/purchases", function(req, res) {
             res.status(201).json(data);
           })
           .catch(function(err) {
-            res.status(500).send("There was an error with the purchase")
+            err = {"status": "fail", error: err};
+            res.status(500).send(err);
           })
         })
       }
     })
     .catch(function(err) {
-      res.status(500).send("Error finding the item")
+      err = {"status": "fail", error: err};
+      res.status(500).send(err);
   })
 });
 
@@ -81,7 +84,8 @@ router.get("/api/vendor/purchases", function(req, res) {
     }
   })
   .catch(function(err) {
-    res.status(500).send("Bad Request");
+    err = {"status": "fail", error: err};
+    res.status(500).send(err);
   })
 });
 
@@ -97,15 +101,17 @@ router.get("/api/vendor/money", function(req, res) {
       res.status(200).json(data);
     })
     .catch(function(err) {
-      res.status(500).send("Error occurred when totalling change")
+      err = {"status": "fail", error: err};
+      res.status(500).send(err);
     })
   })
   .catch(function(err) {
-    res.status(500).send("Error occurred when totalling amt paid")
+    err = {"status": "fail", error: err};
+    res.status(500).send(err);
   })
 });
 
-//add a new item not previously existing in the machine
+//add a new item to the machine
 router.post("/api/vendor/items", function(req, res) {
   models.Item.create({
     description: req.body.description,
@@ -115,11 +121,12 @@ router.post("/api/vendor/items", function(req, res) {
   .then(function(data) {
     data = {"status": "success", data: data};
     res.setHeader("Content-Type", "application/json");
-    res.status(201).json(items);
+    res.status(201).json(data);
   })
   .catch(function(err) {
-    res.status(500).send("Bad Request")
-  });
+    err = {"status": "fail", error: err};
+    res.status(500).send(err);
+  })
 });
 
 //update item quantity, description, and cost
@@ -136,7 +143,8 @@ router.put("/api/vendor/items/:itemId", function(req, res) {
       res.status(201).json(data);
     })
     .catch(function(err) {
-      res.status(500).send("Bad Request")
+      err = {"status": "fail", error: err};
+      res.status(500).send(err);
     })
 });
 
