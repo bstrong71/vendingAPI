@@ -15,6 +15,7 @@ router.get("/api/customer/items", function(req, res) {
   models.Item.findAll({})
   .then(function(items) {
     if(items) {
+      items = {"status": "success", items: items};
       res.setHeader("Content-Type", "application/json");
       res.status(200).json(items);
     } else{
@@ -48,6 +49,7 @@ router.post("/api/customer/items/:itemId/purchases", function(req, res) {
             change: overpaid
           })
           .then(function(data) {
+            data = {"status": "success", data: data};
             res.setHeader("Content-Type", "application/json");
             res.status(201).json(data);
           })
@@ -64,12 +66,43 @@ router.post("/api/customer/items/:itemId/purchases", function(req, res) {
 
 //get a list of all purchases with their item and date/time
 router.get("/api/vendor/purchases", function(req, res) {
-
+  models.Purchase.findAll({
+    include: [
+      {model: models.Item, as: "Items"}
+    ]
+  })
+  .then(function(purchases) {
+    if(purchases) {
+      purchases = {"status": "success", purchases: purchases};
+      res.setHeader("Content-Type", "application/json");
+      res.status(200).json(purchases);
+    } else{
+      res.send("No purchases found.");
+    }
+  })
+  .catch(function(err) {
+    res.status(500).send("Bad Request");
+  })
 });
 
 //get a total amount of money accepted by the machine
 router.get("/api/vendor/money", function(req, res) {
-
+  models.Purchase.sum("amtPaid")
+  .then(function(paid){
+    models.Purchase.sum("change")
+    .then(function(extra) {
+      let total = paid - extra;
+      data = {"status": "success", data: {total}};
+      res.setHeader("Content-Type", "application/json");
+      res.status(200).json(data);
+    })
+    .catch(function(err) {
+      res.status(500).send("Error occurred when totalling change")
+    })
+  })
+  .catch(function(err) {
+    res.status(500).send("Error occurred when totalling amt paid")
+  })
 });
 
 //add a new item not previously existing in the machine
@@ -80,6 +113,7 @@ router.post("/api/vendor/items", function(req, res) {
     qty: req.body.qty
   })
   .then(function(data) {
+    data = {"status": "success", data: data};
     res.setHeader("Content-Type", "application/json");
     res.status(201).json(items);
   })
@@ -97,6 +131,7 @@ router.put("/api/vendor/items/:itemId", function(req, res) {
       where: {id: req.params.itemId}
     })
     .then(function(data) {
+      data = {"status": "success", data: data};
       res.setHeader("Content-Type", "application/json");
       res.status(201).json(data);
     })
